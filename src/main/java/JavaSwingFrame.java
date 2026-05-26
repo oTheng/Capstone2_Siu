@@ -83,14 +83,13 @@ public class JavaSwingFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button1) {
-            outputLabel.setText("Ordering");
             this.setVisible(false);
 
             new OrderOptionsFrame();
         }
 
         if (e.getSource() == button2) {
-                outputLabel.setText("Terminating the program...");
+            JOptionPane.showMessageDialog(this, "Terminating Ever Green Coffee.");
             try {
                 Thread.sleep(1000);
                 System.exit(0);

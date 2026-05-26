@@ -9,7 +9,8 @@ public class OrderOptionsFrame extends JFrame {
     JButton addMainSideButton;
     JButton checkoutButton;
     JButton cancelOrderButton;
-
+    JLabel customerNameLabel;
+    String customerName;
     JLabel selectedItemLabel;
 
     OrderOptionsFrame() {
@@ -72,18 +73,31 @@ public class OrderOptionsFrame extends JFrame {
         optionsPanel.add(checkoutButton);
         optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(cancelOrderButton);
+        customerName = JOptionPane.showInputDialog(
+                this,
+                "Enter customer name:",
+                "Customer Name",
+                JOptionPane.QUESTION_MESSAGE
+        );
 
+        if (customerName == null || customerName.trim().isEmpty()) {
+            customerName = "Guest";
+        }
         JPanel selectedHolderPanel = new JPanel(new BorderLayout());
         selectedHolderPanel.setBackground(Color.WHITE);
-        selectedHolderPanel.setBorder(BorderFactory.createTitledBorder("Selected Item"));
+        selectedHolderPanel.setBorder(BorderFactory.createTitledBorder("Selected Order"));
+
+        customerNameLabel = new JLabel("Customer: " + customerName);
+        customerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        customerNameLabel.setFont(new Font("Serif", Font.BOLD, 20));
 
         selectedItemLabel = new JLabel("No item selected");
         selectedItemLabel.setHorizontalAlignment(SwingConstants.CENTER);
         selectedItemLabel.setVerticalAlignment(SwingConstants.CENTER);
         selectedItemLabel.setFont(new Font("Serif", Font.BOLD, 20));
 
+        selectedHolderPanel.add(customerNameLabel, BorderLayout.NORTH);
         selectedHolderPanel.add(selectedItemLabel, BorderLayout.CENTER);
-
         JPanel mainContentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         mainContentPanel.setBackground(Color.WHITE);
         mainContentPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
@@ -99,7 +113,7 @@ public class OrderOptionsFrame extends JFrame {
         this.add(centerPanel, BorderLayout.CENTER);
 
         addItemButton.addActionListener(e -> {
-            new OrderMenuFrame(this);
+            new ItemCustomizationFrame(this);
         });
 
         addDrinkButton.addActionListener(e -> {
@@ -115,6 +129,8 @@ public class OrderOptionsFrame extends JFrame {
         });
 
         cancelOrderButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Order cancelled.");
+            new JavaSwingFrame();
             dispose();
         });
 
@@ -123,7 +139,11 @@ public class OrderOptionsFrame extends JFrame {
     }
 
     public void setSelectedItem(String itemName) {
-        selectedItemLabel.setText(itemName);
+        selectedItemLabel.setText(
+                "<html><div style='text-align:center; width:250px;'>"
+                        + itemName
+                        + "</div></html>"
+        );
     }
 
     private JButton createOptionButton(String text) {
