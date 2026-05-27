@@ -209,67 +209,37 @@ public class ItemCustomizationFrame extends JFrame {
         String milk = (String) milkComboBox.getSelectedItem();
         String temperature = (String) temperatureComboBox.getSelectedItem();
 
-        StringBuilder orderSummary = new StringBuilder();
+        int extraEspressoShots = (int) espressoShotsSpinner.getValue();
+        int vanillaPumps = (int) vanillaSpinner.getValue();
+        int caramelPumps = (int) caramelSpinner.getValue();
+        int mochaPumps = (int) mochaSpinner.getValue();
+        int hazelnutPumps = (int) hazelnutSpinner.getValue();
 
-        orderSummary.append("<u><b>Selected Coffee</b></u><br>");
-        orderSummary.append("Coffee: ").append(coffeeType).append("<br>");
-        orderSummary.append("Size: ").append(size).append("<br>");
-        orderSummary.append("Milk: ").append(milk).append("<br>");
-        orderSummary.append("Temperature: ").append(temperature).append("<br><br>");
-
-        orderSummary.append("<b>Extras:</b><br>");
-        addExtra(orderSummary, "Extra Espresso Shots", espressoShotsSpinner);
-        addExtra(orderSummary, "Vanilla Pumps", vanillaSpinner);
-        addExtra(orderSummary, "Caramel Pumps", caramelSpinner);
-        addExtra(orderSummary, "Mocha Pumps", mochaSpinner);
-        addExtra(orderSummary, "Hazelnut Pumps", hazelnutSpinner);
-
-        orderSummary.append("<br><b>Add-ons:</b><br>");
-
-        boolean hasAddOn = false;
-
-        if (whippedCreamCheckBox.isSelected()) {
-            orderSummary.append("Whipped Cream<br>");
-            hasAddOn = true;
-        }
-
-        if (sugarCheckBox.isSelected()) {
-            orderSummary.append("Sugar<br>");
-            hasAddOn = true;
-        }
-
-        if (cinnamonCheckBox.isSelected()) {
-            orderSummary.append("Cinnamon<br>");
-            hasAddOn = true;
-        }
-
-        if (!hasAddOn) {
-            orderSummary.append("None<br>");
-        }
+        boolean whippedCream = whippedCreamCheckBox.isSelected();
+        boolean sugar = sugarCheckBox.isSelected();
+        boolean cinnamon = cinnamonCheckBox.isSelected();
 
         String specialInstructions = specialInstructionsArea.getText().trim();
 
-        orderSummary.append("<br><b>Special Instructions:</b><br>");
+        Coffee coffee = new Coffee(
+                orderOptionsFrame.customerName,
+                coffeeType,
+                size,
+                milk,
+                temperature,
+                extraEspressoShots,
+                vanillaPumps,
+                caramelPumps,
+                mochaPumps,
+                hazelnutPumps,
+                whippedCream,
+                sugar,
+                cinnamon,
+                specialInstructions
+        );
 
-        if (specialInstructions.isEmpty()) {
-            orderSummary.append("None");
-        } else {
-            orderSummary.append(specialInstructions);
-        }
-
-        orderOptionsFrame.setSelectedItem(orderSummary.toString());
+        orderOptionsFrame.setSelectedCoffee(coffee);
 
         dispose();
-    }
-
-    private void addExtra(StringBuilder orderSummary, String extraName, JSpinner spinner) {
-        int quantity = (int) spinner.getValue();
-
-        if (quantity > 0) {
-            orderSummary.append(extraName)
-                    .append(" x")
-                    .append(quantity)
-                    .append("<br>");
-        }
     }
 }

@@ -3,15 +3,18 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class OrderOptionsFrame extends JFrame {
-
+    Coffee selectedCoffee;
     JButton addItemButton;
     JButton addDrinkButton;
     JButton addMainSideButton;
     JButton checkoutButton;
     JButton cancelOrderButton;
+
     JLabel customerNameLabel;
-    String customerName;
     JLabel selectedItemLabel;
+
+    String customerName;
+    double selectedItemPrice = 0.0;
 
     OrderOptionsFrame() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -41,6 +44,17 @@ public class OrderOptionsFrame extends JFrame {
         topBar.add(logoLabel, BorderLayout.CENTER);
 
         this.add(topBar, BorderLayout.NORTH);
+
+        customerName = JOptionPane.showInputDialog(
+                this,
+                "Enter customer name:",
+                "Customer Name",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (customerName == null || customerName.trim().isEmpty()) {
+            customerName = "Guest";
+        }
 
         JLabel titleLabel = new JLabel("What would you like to do?");
         titleLabel.setForeground(Color.BLACK);
@@ -73,31 +87,27 @@ public class OrderOptionsFrame extends JFrame {
         optionsPanel.add(checkoutButton);
         optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(cancelOrderButton);
-        customerName = JOptionPane.showInputDialog(
-                this,
-                "Enter customer name:",
-                "Customer Name",
-                JOptionPane.QUESTION_MESSAGE
-        );
 
-        if (customerName == null || customerName.trim().isEmpty()) {
-            customerName = "Guest";
-        }
         JPanel selectedHolderPanel = new JPanel(new BorderLayout());
         selectedHolderPanel.setBackground(Color.WHITE);
         selectedHolderPanel.setBorder(BorderFactory.createTitledBorder("Selected Order"));
 
         customerNameLabel = new JLabel("Customer: " + customerName);
         customerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        customerNameLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        customerNameLabel.setFont(new Font("Serif", Font.BOLD, 18));
 
         selectedItemLabel = new JLabel("No item selected");
         selectedItemLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        selectedItemLabel.setVerticalAlignment(SwingConstants.CENTER);
-        selectedItemLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        selectedItemLabel.setVerticalAlignment(SwingConstants.TOP);
+        selectedItemLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+
+        JScrollPane selectedScrollPane = new JScrollPane(selectedItemLabel);
+        selectedScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        selectedScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         selectedHolderPanel.add(customerNameLabel, BorderLayout.NORTH);
-        selectedHolderPanel.add(selectedItemLabel, BorderLayout.CENTER);
+        selectedHolderPanel.add(selectedScrollPane, BorderLayout.CENTER);
+
         JPanel mainContentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         mainContentPanel.setBackground(Color.WHITE);
         mainContentPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
@@ -125,12 +135,11 @@ public class OrderOptionsFrame extends JFrame {
         });
 
         checkoutButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Checking out with: " + selectedItemLabel.getText());
+            saveOrderToCSV();
         });
 
         cancelOrderButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Order cancelled.");
-            new JavaSwingFrame();
             dispose();
         });
 
@@ -138,14 +147,41 @@ public class OrderOptionsFrame extends JFrame {
         this.setVisible(true);
     }
 
-    public void setSelectedItem(String itemName) {
+    public void setSelectedItem(String itemName, double price) {
+        selectedItemPrice = price;
+
         selectedItemLabel.setText(
                 "<html><div style='text-align:center; width:250px;'>"
                         + itemName
+                        + "<br><br><b>Price: $" + String.format("%.2f", price) + "</b>"
                         + "</div></html>"
         );
     }
+    public void setSelectedCoffee(Coffee coffee) {
+        selectedCoffee = coffee;
+        selectedItemPrice = coffee.getPrice();
 
+        selectedItemLabel.setText(
+                "<html><div style='text-align:center; width:250px;'>"
+                        + coffee.getDisplayText()
+                        + "<br><br>"
+                        + coffee.getPriceBreakdownText()
+                        + "</div></html>"
+        );
+    }
+    private void saveOrderToCSV() {
+        if (selectedCoffee == null) {
+            JOptionPane.showMessageDialog(this, "Please select an item before checkout.");
+            return;
+        }
+        OrderCSVWriter.writeCoffeeOrder(selectedCoffee);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Order saved successfully!\nTotal: $" + String.format("%.2f", selectedCoffee.getTotal())
+        );
+        dispose();
+    }
     private JButton createOptionButton(String text) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(250, 55));

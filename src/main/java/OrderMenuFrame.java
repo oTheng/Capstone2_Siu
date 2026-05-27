@@ -8,6 +8,8 @@ public class OrderMenuFrame extends JFrame {
     JButton cappuccinoButton;
     JButton americanoButton;
     JButton mochaButton;
+    JButton coldBrewButton;
+    JButton espressoButton;
 
     OrderOptionsFrame orderOptionsFrame;
 
@@ -15,7 +17,7 @@ public class OrderMenuFrame extends JFrame {
         this.orderOptionsFrame = orderOptionsFrame;
 
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setTitle("Ever Green Coffee - Order Menu");
+        this.setTitle("Ever Green Coffee - Drink Menu");
         this.setSize(800, 800);
         this.setLayout(new BorderLayout());
         this.setResizable(false);
@@ -42,17 +44,19 @@ public class OrderMenuFrame extends JFrame {
 
         this.add(topBar, BorderLayout.NORTH);
 
-        JLabel letterLabel = new JLabel("Choose One Coffee");
-        letterLabel.setForeground(Color.BLACK);
-        letterLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        letterLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Choose One Drink");
+        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         latteButton = createMenuButton("Latte - $4.50");
         cappuccinoButton = createMenuButton("Cappuccino - $4.25");
         americanoButton = createMenuButton("Americano - $3.50");
         mochaButton = createMenuButton("Mocha - $5.00");
+        coldBrewButton = createMenuButton("Cold Brew - $4.75");
+        espressoButton = createMenuButton("Espresso - $3.00");
 
-        JPanel menuPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        JPanel menuPanel = new JPanel(new GridLayout(3, 2, 20, 20));
         menuPanel.setBackground(Color.WHITE);
         menuPanel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
 
@@ -60,25 +64,36 @@ public class OrderMenuFrame extends JFrame {
         menuPanel.add(cappuccinoButton);
         menuPanel.add(americanoButton);
         menuPanel.add(mochaButton);
+        menuPanel.add(coldBrewButton);
+        menuPanel.add(espressoButton);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.add(letterLabel, BorderLayout.NORTH);
+        centerPanel.add(titleLabel, BorderLayout.NORTH);
         centerPanel.add(menuPanel, BorderLayout.CENTER);
 
         this.add(centerPanel, BorderLayout.CENTER);
 
-        latteButton.addActionListener(e -> selectItem("Latte - $4.50"));
-        cappuccinoButton.addActionListener(e -> selectItem("Cappuccino - $4.25"));
-        americanoButton.addActionListener(e -> selectItem("Americano - $3.50"));
-        mochaButton.addActionListener(e -> selectItem("Mocha - $5.00"));
+        latteButton.addActionListener(e -> selectDrink("Latte", 4.50));
+        cappuccinoButton.addActionListener(e -> selectDrink("Cappuccino", 4.25));
+        americanoButton.addActionListener(e -> selectDrink("Americano", 3.50));
+        mochaButton.addActionListener(e -> selectDrink("Mocha", 5.00));
+        coldBrewButton.addActionListener(e -> selectDrink("Cold Brew", 4.75));
+        espressoButton.addActionListener(e -> selectDrink("Espresso", 3.00));
 
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
-    private void selectItem(String itemName) {
-        orderOptionsFrame.setSelectedItem(itemName);
+    private void selectDrink(String drinkName, double price) {
+        String orderSummary =
+                "<u>Selected Drink</u><br>"
+                        + "Drink: " + drinkName + "<br>"
+                        + "Size: Regular<br>"
+                        + "Special Instructions: None";
+
+        orderOptionsFrame.setSelectedItem(orderSummary, price);
+
         dispose();
     }
 

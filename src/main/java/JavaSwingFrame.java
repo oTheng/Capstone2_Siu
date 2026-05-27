@@ -96,7 +96,6 @@ public class JavaSwingFrame extends JFrame implements ActionListener {
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-
         }
     }
 }
