@@ -350,11 +350,19 @@ public class Coffee {
             text.append("|None");
         }
 
+        String cleanSpecialInstructions;
+
         if (specialInstructions == null || specialInstructions.trim().isEmpty()) {
-            text.append("|None");
+            cleanSpecialInstructions = "None";
         } else {
-            text.append("|").append(specialInstructions.trim());
+            cleanSpecialInstructions = specialInstructions
+                    .trim()
+                    .replace("|", "/")
+                    .replace("\n", " ")
+                    .replace("\r", " ");
         }
+
+        text.append("|").append(cleanSpecialInstructions);
 
         return text.toString();
     }
