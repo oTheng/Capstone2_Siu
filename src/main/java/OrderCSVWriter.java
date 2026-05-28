@@ -24,6 +24,7 @@ public class OrderCSVWriter {
                     coffee.getCustomerName()
                             + "|"
                             + coffee.toFileText()
+                            + "|"
                             + String.format("%.2f", coffee.getTotal())
                             + "|"
                             + timestamp
