@@ -15,7 +15,7 @@ public class OrderOptionsFrame extends JFrame {
 
     String customerName;
     double selectedItemPrice = 0.0;
-
+    JButton pastReceiptsButton;
     OrderOptionsFrame() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setTitle("Ever Green Coffee - Order Options");
@@ -66,7 +66,7 @@ public class OrderOptionsFrame extends JFrame {
         addMainSideButton = createOptionButton("3) Add Main Side");
         checkoutButton = createOptionButton("4) Checkout");
         cancelOrderButton = createOptionButton("0) Cancel Order");
-
+        pastReceiptsButton = createOptionButton("5) Past Receipts");
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setBackground(Color.WHITE);
@@ -105,8 +105,21 @@ public class OrderOptionsFrame extends JFrame {
         selectedScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         selectedScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        pastReceiptsButton = createOptionButton("Past Receipts");
+        pastReceiptsButton.setPreferredSize(new Dimension(220, 45));
+        pastReceiptsButton.setMaximumSize(new Dimension(220, 45));
+
+        JPanel selectedBottomPanel = new JPanel();
+        selectedBottomPanel.setBackground(Color.WHITE);
+        selectedBottomPanel.add(pastReceiptsButton);
+
         selectedHolderPanel.add(customerNameLabel, BorderLayout.NORTH);
         selectedHolderPanel.add(selectedScrollPane, BorderLayout.CENTER);
+        selectedHolderPanel.add(selectedBottomPanel, BorderLayout.SOUTH);
+
+        pastReceiptsButton.addActionListener(e -> {
+            new PastReceiptsFrame();
+        });
 
         JPanel mainContentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         mainContentPanel.setBackground(Color.WHITE);
@@ -174,12 +187,16 @@ public class OrderOptionsFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select an item before checkout.");
             return;
         }
+
         OrderCSVWriter.writeCoffeeOrder(selectedCoffee);
+
+        new SmallReceiptFrame(selectedCoffee);
 
         JOptionPane.showMessageDialog(
                 this,
                 "Order saved successfully!\nTotal: $" + String.format("%.2f", selectedCoffee.getTotal())
         );
+
         dispose();
     }
     private JButton createOptionButton(String text) {
