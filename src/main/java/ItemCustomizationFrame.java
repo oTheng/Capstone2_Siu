@@ -238,7 +238,7 @@ public class ItemCustomizationFrame extends JFrame {
                 specialInstructions
         );
 
-        orderOptionsFrame.setSelectedCoffee(coffee);
+        orderOptionsFrame.addItemToOrder(coffee);
 
         dispose();
     }

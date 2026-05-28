@@ -21,14 +21,8 @@ public class PastReceiptsFrame extends JFrame {
 
         String[] columns = {
                 "Customer",
-                "Coffee",
-                "Size",
-                "Milk",
-                "Temperature",
-                "Extras",
-                "Add-ons",
-                "Special Instructions",
-                "Price",
+                "Items",
+                "Total",
                 "Date/Time"
         };
 
@@ -41,18 +35,26 @@ public class PastReceiptsFrame extends JFrame {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("\\|");
 
-                if (parts.length >= 10) {
+                if (parts.length >= 4) {
+                    String customer = parts[0];
+                    String dateTime = parts[parts.length - 1];
+                    String total = parts[parts.length - 2];
+
+                    StringBuilder items = new StringBuilder();
+
+                    for (int i = 1; i < parts.length - 2; i++) {
+                        items.append(parts[i]);
+
+                        if (i < parts.length - 3) {
+                            items.append(" | ");
+                        }
+                    }
+
                     model.addRow(new Object[]{
-                            parts[0],
-                            parts[1],
-                            parts[2],
-                            parts[3],
-                            parts[4],
-                            parts[5],
-                            parts[6],
-                            parts[7],
-                            "$" + parts[8],
-                            parts[9]
+                            customer,
+                            items.toString(),
+                            "$" + total,
+                            dateTime
                     });
                 }
             }
@@ -67,9 +69,14 @@ public class PastReceiptsFrame extends JFrame {
         }
 
         JTable receiptsTable = new JTable(model);
-        receiptsTable.setRowHeight(30);
+        receiptsTable.setRowHeight(35);
         receiptsTable.setFont(new Font("Serif", Font.PLAIN, 14));
         receiptsTable.getTableHeader().setFont(new Font("Serif", Font.BOLD, 14));
+
+        receiptsTable.getColumnModel().getColumn(0).setPreferredWidth(120);
+        receiptsTable.getColumnModel().getColumn(1).setPreferredWidth(600);
+        receiptsTable.getColumnModel().getColumn(2).setPreferredWidth(100);
+        receiptsTable.getColumnModel().getColumn(3).setPreferredWidth(150);
 
         JScrollPane scrollPane = new JScrollPane(receiptsTable);
 

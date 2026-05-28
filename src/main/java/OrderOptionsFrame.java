@@ -3,19 +3,20 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 public class OrderOptionsFrame extends JFrame {
-    Coffee selectedCoffee;
+    Order currentOrder;
     JButton addItemButton;
     JButton addDrinkButton;
     JButton addMainSideButton;
     JButton checkoutButton;
     JButton cancelOrderButton;
-
+    JButton removeItemButton;
     JLabel customerNameLabel;
     JLabel selectedItemLabel;
-
+    JButton signatureItemButton;
     String customerName;
     double selectedItemPrice = 0.0;
     JButton pastReceiptsButton;
+
     OrderOptionsFrame() {
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setTitle("Ever Green Coffee - Order Options");
@@ -63,6 +64,7 @@ public class OrderOptionsFrame extends JFrame {
         } else {
             customerName = customerName.trim();
         }
+        currentOrder = new Order(customerName);
 
         JLabel titleLabel = new JLabel("What would you like to do?");
         titleLabel.setForeground(Color.BLACK);
@@ -72,9 +74,10 @@ public class OrderOptionsFrame extends JFrame {
         addItemButton = createOptionButton("1) Add Item");
         addDrinkButton = createOptionButton("2) Add Drink");
         addMainSideButton = createOptionButton("3) Add Main Side");
-        checkoutButton = createOptionButton("4) Checkout");
+        signatureItemButton = createOptionButton("4) Signature Items");
+        checkoutButton = createOptionButton("5) Checkout");
         cancelOrderButton = createOptionButton("0) Cancel Order");
-        pastReceiptsButton = createOptionButton("5) Past Receipts");
+
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setBackground(Color.WHITE);
@@ -83,19 +86,24 @@ public class OrderOptionsFrame extends JFrame {
         addItemButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         addDrinkButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         addMainSideButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        signatureItemButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         checkoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         cancelOrderButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         optionsPanel.add(addItemButton);
         optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(addDrinkButton);
         optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(addMainSideButton);
         optionsPanel.add(Box.createVerticalStrut(15));
+        optionsPanel.add(signatureItemButton);
+        optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(checkoutButton);
         optionsPanel.add(Box.createVerticalStrut(15));
         optionsPanel.add(cancelOrderButton);
 
+        signatureItemButton.addActionListener(e -> {
+            new SignatureItemFrame(this);
+        });
         JPanel selectedHolderPanel = new JPanel(new BorderLayout());
         selectedHolderPanel.setBackground(Color.WHITE);
         selectedHolderPanel.setBorder(BorderFactory.createTitledBorder("Selected Order"));
@@ -113,14 +121,24 @@ public class OrderOptionsFrame extends JFrame {
         selectedScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         selectedScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        removeItemButton = createOptionButton("Remove Last Item");
+        removeItemButton.setPreferredSize(new Dimension(220, 45));
+        removeItemButton.setMaximumSize(new Dimension(220, 45));
+
         pastReceiptsButton = createOptionButton("Past Receipts");
         pastReceiptsButton.setPreferredSize(new Dimension(220, 45));
         pastReceiptsButton.setMaximumSize(new Dimension(220, 45));
 
         JPanel selectedBottomPanel = new JPanel();
         selectedBottomPanel.setBackground(Color.WHITE);
-        selectedBottomPanel.add(pastReceiptsButton);
+        selectedBottomPanel.setLayout(new BoxLayout(selectedBottomPanel, BoxLayout.Y_AXIS));
 
+        removeItemButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pastReceiptsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        selectedBottomPanel.add(removeItemButton);
+        selectedBottomPanel.add(Box.createVerticalStrut(10));
+        selectedBottomPanel.add(pastReceiptsButton);
         selectedHolderPanel.add(customerNameLabel, BorderLayout.NORTH);
         selectedHolderPanel.add(selectedScrollPane, BorderLayout.CENTER);
         selectedHolderPanel.add(selectedBottomPanel, BorderLayout.SOUTH);
@@ -128,7 +146,9 @@ public class OrderOptionsFrame extends JFrame {
         pastReceiptsButton.addActionListener(e -> {
             new PastReceiptsFrame();
         });
-
+        removeItemButton.addActionListener(e -> {
+            removeLastItemFromOrder();
+        });
         JPanel mainContentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         mainContentPanel.setBackground(Color.WHITE);
         mainContentPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
@@ -148,11 +168,10 @@ public class OrderOptionsFrame extends JFrame {
         });
 
         addDrinkButton.addActionListener(e -> {
-            new OrderMenuFrame(this);
+            new DrinkMenuFrame(this);
         });
-
         addMainSideButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Main Side menu coming soon!");
+            new MainSideFrame(this);
         });
 
         checkoutButton.addActionListener(e -> {
@@ -179,31 +198,28 @@ public class OrderOptionsFrame extends JFrame {
                         + "</div></html>"
         );
     }
-    public void setSelectedCoffee(Coffee coffee) {
-        selectedCoffee = coffee;
-        selectedItemPrice = coffee.getPrice();
+    public void addItemToOrder(OrderItem item) {
+        currentOrder.addItem(item);
 
         selectedItemLabel.setText(
                 "<html><div style='text-align:center; width:250px;'>"
-                        + coffee.getDisplayText()
-                        + "<br><br>"
-                        + coffee.getPriceBreakdownText()
+                        + currentOrder.getDisplayText()
                         + "</div></html>"
         );
     }
     private void saveOrderToCSV() {
-        if (selectedCoffee == null) {
-            JOptionPane.showMessageDialog(this, "Please select an item before checkout.");
+        if (currentOrder == null || currentOrder.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select at least one item before checkout.");
             return;
         }
 
-        OrderCSVWriter.writeCoffeeOrder(selectedCoffee);
+        OrderCSVWriter.writeOrder(currentOrder);
 
-        new SmallReceiptFrame(selectedCoffee);
+        new SmallReceiptFrame(currentOrder);
 
         JOptionPane.showMessageDialog(
                 this,
-                "Order saved successfully!\nTotal: $" + String.format("%.2f", selectedCoffee.getTotal())
+                "Order saved successfully!\nTotal: $" + String.format("%.2f", currentOrder.getTotal())
         );
 
         dispose();
@@ -211,12 +227,37 @@ public class OrderOptionsFrame extends JFrame {
     }
     private JButton createOptionButton(String text) {
         JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(250, 55));
-        button.setMaximumSize(new Dimension(250, 55));
+
+        Dimension buttonSize = new Dimension(250, 55);
+
+        button.setPreferredSize(buttonSize);
+        button.setMaximumSize(buttonSize);
+        button.setMinimumSize(buttonSize);
+
         button.setFont(new Font("Serif", Font.BOLD, 18));
         button.setFocusable(false);
         button.setBackground(new Color(245, 245, 245));
         button.setForeground(Color.BLACK);
+
         return button;
     }
+    private void removeLastItemFromOrder() {
+        if (currentOrder == null || currentOrder.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "There are no items to remove.");
+            return;
+        }
+
+        currentOrder.removeLastItem();
+
+        if (currentOrder.isEmpty()) {
+            selectedItemLabel.setText("No item selected");
+        } else {
+            selectedItemLabel.setText(
+                    "<html><div style='text-align:center; width:250px;'>"
+                            + currentOrder.getDisplayText()
+                            + "</div></html>"
+            );
+        }
+    }
+
 }

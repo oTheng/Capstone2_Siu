@@ -1,4 +1,4 @@
-public class Coffee {
+public class Coffee implements OrderItem{
 
     private String customerName;
     private String coffeeType;
@@ -456,5 +456,9 @@ public class Coffee {
                 .append("</b>");
 
         return text.toString();
+    }
+    @Override
+    public String getItemName() {
+        return coffeeType;
     }
 }

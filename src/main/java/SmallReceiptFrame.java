@@ -5,9 +5,9 @@ import java.time.format.DateTimeFormatter;
 
 public class SmallReceiptFrame extends JFrame {
 
-    SmallReceiptFrame(Coffee coffee) {
+    SmallReceiptFrame(Order order) {
         this.setTitle("Ever Green Coffee - Receipt");
-        this.setSize(360, 520);
+        this.setSize(380, 560);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(new BorderLayout());
         this.setResizable(false);
@@ -18,7 +18,7 @@ public class SmallReceiptFrame extends JFrame {
         JTextArea receiptArea = new JTextArea();
         receiptArea.setEditable(false);
         receiptArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        receiptArea.setText(buildReceiptText(coffee, timestamp));
+        receiptArea.setText(buildReceiptText(order, timestamp));
 
         JScrollPane scrollPane = new JScrollPane(receiptArea);
 
@@ -41,35 +41,45 @@ public class SmallReceiptFrame extends JFrame {
         this.setVisible(true);
     }
 
-    private String buildReceiptText(Coffee coffee, String timestamp) {
-        String[] parts = coffee.toFileText().split("\\|");
+    private String buildReceiptText(Order order, String timestamp) {
+        StringBuilder receipt = new StringBuilder();
 
-        String coffeeType = parts[0];
-        String size = parts[1];
-        String milk = parts[2];
-        String temperature = parts[3];
-        String extras = parts[4];
-        String addOns = parts[5];
-        String specialInstructions = parts[6];
+        receipt.append("================================\n");
+        receipt.append("       EVER GREEN COFFEE        \n");
+        receipt.append("================================\n");
+        receipt.append("Customer: ").append(order.getCustomerName()).append("\n");
+        receipt.append("Date/Time: ").append(timestamp).append("\n");
+        receipt.append("--------------------------------\n");
 
-        return
-                "================================\n" +
-                        "       EVER GREEN COFFEE        \n" +
-                        "================================\n" +
-                        "Customer: " + coffee.getCustomerName() + "\n" +
-                        "Date/Time: " + timestamp + "\n" +
-                        "--------------------------------\n" +
-                        "Drink: " + coffeeType + "\n" +
-                        "Size: " + size + "\n" +
-                        "Milk: " + milk + "\n" +
-                        "Temperature: " + temperature + "\n" +
-                        "Extras: " + extras + "\n" +
-                        "Add-ons: " + addOns + "\n" +
-                        "Special: " + specialInstructions + "\n" +
-                        "--------------------------------\n" +
-                        "TOTAL: $" + String.format("%.2f", coffee.getTotal()) + "\n" +
-                        "================================\n" +
-                        "     Thank you for visiting!    \n" +
-                        "================================\n";
+        for (int i = 0; i < order.getItems().size(); i++) {
+            OrderItem item = order.getItems().get(i);
+
+            receipt.append("Item ").append(i + 1).append("\n");
+
+            receipt.append(
+                    item.getDisplayText()
+                            .replace("<u>", "")
+                            .replace("</u>", "")
+                            .replace("<b>", "")
+                            .replace("</b>", "")
+                            .replace("<br>", "\n")
+            );
+
+            receipt.append("\n");
+            receipt.append("Price: $")
+                    .append(String.format("%.2f", item.getTotal()))
+                    .append("\n");
+
+            receipt.append("--------------------------------\n");
+        }
+        receipt.append("TOTAL: $")
+                .append(String.format("%.2f", order.getTotal()))
+                .append("\n");
+
+        receipt.append("================================\n");
+        receipt.append("     Thank you for visiting!    \n");
+        receipt.append("================================\n");
+
+        return receipt.toString();
     }
 }

@@ -36,4 +36,32 @@ public class OrderCSVWriter {
             System.out.println("Error writing order to file.");
         }
     }
+    public static void writeOrder(Order order) {
+        try {
+            File file = new File(FILE_PATH);
+            FileWriter fileWriter = new FileWriter(file, true);
+
+            if (file.length() > 0) {
+                fileWriter.write(System.lineSeparator());
+            }
+
+            String timestamp = java.time.LocalDateTime.now()
+                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+
+            fileWriter.write(
+                    order.getCustomerName()
+                            + "|"
+                            + order.toFileText()
+                            + "|"
+                            + String.format("%.2f", order.getTotal())
+                            + "|"
+                            + timestamp
+            );
+
+            fileWriter.close();
+
+        } catch (IOException ex) {
+            System.out.println("Error writing order to file.");
+        }
+    }
 }
