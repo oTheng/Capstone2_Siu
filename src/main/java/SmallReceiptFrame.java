@@ -32,7 +32,12 @@ public class SmallReceiptFrame extends JFrame {
         this.add(scrollPane, BorderLayout.CENTER);
         this.add(bottomPanel, BorderLayout.SOUTH);
 
-        this.setLocationRelativeTo(null);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int x = screenSize.width - this.getWidth() - 40;
+        int y = 100;
+
+        this.setLocation(x, y);
         this.setVisible(true);
     }
 

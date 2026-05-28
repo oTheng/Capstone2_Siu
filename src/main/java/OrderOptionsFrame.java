@@ -52,8 +52,16 @@ public class OrderOptionsFrame extends JFrame {
                 JOptionPane.QUESTION_MESSAGE
         );
 
-        if (customerName == null || customerName.trim().isEmpty()) {
+        if (customerName == null) {
+            dispose();
+            new JavaSwingFrame();
+            return;
+        }
+
+        if (customerName.trim().isEmpty()) {
             customerName = "Guest";
+        } else {
+            customerName = customerName.trim();
         }
 
         JLabel titleLabel = new JLabel("What would you like to do?");
@@ -154,6 +162,7 @@ public class OrderOptionsFrame extends JFrame {
         cancelOrderButton.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Order cancelled.");
             dispose();
+            new JavaSwingFrame();
         });
 
         this.setLocationRelativeTo(null);
@@ -198,6 +207,7 @@ public class OrderOptionsFrame extends JFrame {
         );
 
         dispose();
+        new JavaSwingFrame();
     }
     private JButton createOptionButton(String text) {
         JButton button = new JButton(text);
